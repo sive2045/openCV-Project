@@ -8,47 +8,25 @@ int main()
 {
 	Mat img_color;
 
-	img_color = imread("download.jpg", IMREAD_COLOR);
-	if (img_color.empty())
-	{
-		cout << "파일을 열 수 없습니다!" << endl;
-		return -1;
-	}
+	img_color = imread("love.jpg", IMREAD_COLOR);
 
-	Mat img_gray_3channel, img_gray_1channel;
-	img_gray_3channel.create(img_color.rows, img_color.cols, CV_8UC3);
-	img_gray_1channel.create(img_color.rows, img_color.cols, CV_8UC1);
+	Mat img_channels[3];
+	split(img_color, img_channels);
+	
+	//BGR->RGB로 바꿈.
+	vector<Mat> channels;
+	channels.push_back(img_channels[2]); //red;
+	channels.push_back(img_channels[1]); //green;
+	channels.push_back(img_channels[0]); //blue;
 
-	for (int y = 0; y < img_color.rows; y++)
-	{
-		for (int x = 0; x < img_color.cols; x++)
-		{
-			//2
-			uchar b = img_color.at<Vec3b>(y, x)[0];
-			uchar g = img_color.at<Vec3b>(y, x)[1];
-			uchar r = img_color.at<Vec3b>(y, x)[2];
+	Mat img_result;
+	merge(channels, img_result);
 
-			//3
-			uchar gray = (b + g + r) / 3.0;
-
-
-			//4
-			img_gray_1channel.at<uchar>(y, x) = gray;
-
-
-
-			//5
-			img_gray_3channel.at<Vec3b>(y, x)[0] = gray;
-			img_gray_3channel.at<Vec3b>(y, x)[1] = gray;
-			img_gray_3channel.at<Vec3b>(y, x)[2] = gray;
-		}
-	}
-
-
-	imshow("Grayscale 3 channel", img_gray_3channel);
-	imshow("Grayscale 1 channel", img_gray_1channel);
-
-	while (waitKey(0) != 27);
+	imshow("Color",img_result);
+	imshow("B", img_channels[0]);
+	imshow("G", img_channels[1]);
+	imshow("R", img_channels[2]);
+	waitKey(0);
 
 	return 0;
 }
