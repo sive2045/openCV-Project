@@ -4,41 +4,30 @@
 using namespace std;
 using namespace cv;
 
-static void on_trackbar(int, void*)
-{
-
-}
 
 int main()
 {
-	namedWindow("Canny");
-
-	//트랙바 생성
-	createTrackbar("low threshold", "Canny", 0, 1000, on_trackbar);
-	createTrackbar("high threshold", "Canny", 0, 1000, on_trackbar);
-
-	//트랙바 초기값 설정
-	setTrackbarPos("low threshold", "Canny", 50);
-	setTrackbarPos("high threshold", "Canny", 150);
-
-	Mat img_gray;
-	img_gray = imread("road.jpg", IMREAD_GRAYSCALE);
-
-	//트랙바 조정시 Canny함수에 반영되도록 무한루프를 사용
-	while (1)
+	Mat img_1, img_2;
+	double alpha = 0.0;
+	double beta = 1.0;
+	
+	while (alpha <= 1.0)
 	{
-		//현재 트랙바위치 불러오기
-		int low = getTrackbarPos("low threshold", "Canny");
-		int high =getTrackbarPos("high threshold", "Canny");
+		//addWeight처리하기위해서는 매번 불러와야함. 
+		//두 이미지 크기는 같아야 함.
+		img_1 = imread("love.jpg", IMREAD_COLOR);
+		img_2 = imread("back.jpg", IMREAD_COLOR);
 
-		Mat img_canny;
-		Canny(img_gray, img_canny, low, high);
+		Mat dst;
+		addWeighted(img_1, alpha, img_2, beta, 0, dst);
 
-		//Canny함수의 실행결과확인 Canny란? 윤곽선을 따는 함수로 라인을 따준다.
-		imshow("Canny", img_canny);
+		cout << alpha << " " << beta << endl;
 
-		if (waitKey(1) == 27)
-			break;
+		imshow("Result", dst);
+		waitKey(0);
+
+		alpha += 0.1;
+		beta -= 0.1;
 	}
 
 	return 0;
