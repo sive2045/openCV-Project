@@ -5,32 +5,24 @@ using namespace std;
 using namespace cv;
 
 
+
 int main()
 {
-	Mat img;
-	img = imread("love.jpg", IMREAD_COLOR);
+	Mat img_color = imread("love.jpg", IMREAD_COLOR);
+	imshow("original", img_color);
+	Mat img_result;
+	resize(img_color, img_result, Size(), 2, 2, INTER_CUBIC);
+	imshow("x2 INTER_CUBIC", img_result);
 
-	int height = img.rows;
-	int width = img.cols;
-
-	int center_x = (int)width*0.5;
-	int center_y = (int)height*0.5;
-
-	//깊은 복사를 통해 원본 유지한채 canny처리
-	Mat img_roi;
-	img_roi = img(Rect(center_x - 100, center_y - 100, 200, 200)).clone();
-	Mat img_gray;
-	cvtColor(img_roi, img_gray, COLOR_BGR2GRAY);
-	//canny처리후 BGR체널로 전환
-	Mat img_edge;
-	Canny(img_gray, img_edge, 100, 300);
-	cvtColor(img_edge, img_edge, COLOR_GRAY2BGR);
-	//원본에 합셩
-	img_edge.copyTo(img(Rect(center_x-100,center_y-100,200,200)));
-	//결과 보여주기
+	int width = img_color.cols;
+	int height = img_color.rows;
 	
-	imshow("ROI", img_roi);
-	imshow("Result", img);
+	resize(img_color, img_result, Size(3 * width, 3 * height), INTER_LINEAR);
+	imshow("x3 INTER_LINEAR", img_result);
+
+	resize(img_color, img_result, Size(), 0.5, 0.5, INTER_AREA);
+	imshow("x0.5 INTER_AREA", img_result);
+
 	waitKey(0);
 
 	return 0;
