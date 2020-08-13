@@ -4,54 +4,37 @@
 using namespace std;
 using namespace cv;
 
-Point2f src[4];
-int idx = 0;
-Mat img_color;
-
-void mouse_callback(int event, int x, int y, int flags, void* userdata)
+static void on_trackbar(int, void*)
 {
-	if (event == EVENT_LBUTTONDOWN)
-	{
-		src[idx] = Point(x, y);
-		idx++;
-		cout << "(" << x << ", " << y << ")" << endl;
-		circle(img_color, Point(x, y), 10, Scalar(0, 255, 0), -1);
-	}
+
 }
 
 int main()
 {
-	namedWindow("source");
-	setMouseCallback("source", mouse_callback);
-	img_color = imread("road.jpg");
-	Mat img_original;
-	img_original = img_color.clone();
+	namedWindow("Canny Edge");
+	createTrackbar("low threshold", "Canny Edge", 0, 1000, on_trackbar);
+	createTrackbar("high threshold", "Canny Edge", 0, 1000, on_trackbar);
+	setTrackbarPos("low threshold", "Canny Edge", 50);
+	setTrackbarPos("high threshold", "Canny Edge", 150);
+	Mat img;
+	img = imread("1.png", IMREAD_COLOR);
+	Mat img_gray;
+	cvtColor(img, img_gray, COLOR_BGR2GRAY);
+	imshow("Original", img_gray);
+	Mat img_edge;
+	blur(img_gray, img_gray, Size(3, 3));
 
 	while (1)
 	{
-		imshow("source", img_color);
+		int low = getTrackbarPos("low threshold", "Canny Edge");
+		int high = getTrackbarPos("high threshold", "Canny Edge");
 
-		if (waitKey(1) == 32)
+		Canny(img_gray, img_edge, low, high, 3);
+		imshow("Canny Edge", img_edge);
+
+		if (waitKey(1) == 27)
 			break;
 	}
-
-	int height = img_color.rows;
-	int width = img_color.cols;
-
-	Point2f dst[3];
-	dst[0] = Point2f(0, 0);
-	dst[1] = Point2f(width, 0);
-	dst[2] = Point2f(0, height);
-	dst[3] = Point2f(width, height);
-
-	Mat M;
-	M = getPerspectiveTransform(src, dst);
-
-	Mat img_result;
-	warpPerspective(img_original, img_result, M, Size(width, height));
-
-	imshow("result", img_result);
-	waitKey(0);
 
 	return 0;
 }
